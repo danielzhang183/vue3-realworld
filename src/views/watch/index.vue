@@ -1,4 +1,82 @@
 <!-- src\views\watch\index.vue -->
+<script lang="ts">
+import { defineComponent, onMounted, ref } from 'vue'
+import { useRoute } from 'vue-router'
+import type { Video } from '@/apis/video'
+import { getVideo } from '@/apis/video'
+import type { VideoPlayAuthPayload } from '@/apis/vod'
+import { getVideoPlayAuth } from '@/apis/vod'
+
+const createPlayer = (data: VideoPlayAuthPayload) => {
+  let onReady: (value: unknown) => void
+  const p = new Promise((resolve) => {
+    onReady = resolve
+  })
+  // eslint-disable-next-line no-new
+  new window.Aliplayer(
+    {
+      id: 'J_prismPlayer',
+      width: '100%',
+      height: '500px',
+      autoplay: false,
+      // // 支持播放地址播放,此播放优先级最高
+      // source: '播放url',
+
+      // 播放方式二：点播用户推荐
+      vid: data.VideoMeta.VideoId,
+      playauth: data.PlayAuth,
+      cover: data.VideoMeta.CoverURL,
+      // encryptType: 1 // 当播放私有加密流时需要设置。
+
+      // 播放方式三：仅MPS用户使用
+      // vid: '1e067a2831b641db90d570b6480fbc40',
+      // accId: 'dd',
+      // accSecret: 'dd',
+      // stsToken: 'dd',
+      // domainRegion: 'dd',
+      // authInfo: 'dd',
+
+      // 播放方式四：使用STS方式播放
+      // vid: '1e067a2831b641db90d570b6480fbc40',
+      // accessKeyId: 'dd',
+      // securityToken: 'dd',
+      // accessKeySecret: 'dd',
+      // region: 'cn-shanghai' // eu-central-1,ap-southeast-1
+    },
+    (player: any) => {
+      onReady(player)
+    },
+  )
+  return p
+}
+
+export default defineComponent({
+  name: 'WatchIndex',
+  setup() {
+    const video = ref<Video | null>(null)
+    const route = useRoute()
+    const lodaVideoInfo = async () => {
+      const videoId = route.params.videoId as string
+      const { data } = await getVideo(videoId)
+      video.value = data.video
+    }
+    const playVideo = async (vodVideoId: string) => {
+      const { data } = await getVideoPlayAuth(vodVideoId)
+      createPlayer(data)
+      // 获取视频播放凭证
+      // 创建播放器，播放视频
+    }
+    onMounted(async () => {
+      await lodaVideoInfo()
+      playVideo(video.value?.vodVideoId as string)
+    })
+    return {
+      video,
+    }
+  },
+})
+</script>
+
 <template>
   <div class=".sc-AxmLO gmtmqV">
     <div class="sc-fzoXWK fRnHrz">

@@ -12,20 +12,25 @@ const routes: Array<RouteRecordRaw> = [
       {
         path: '',
         name: 'home',
-        component: () => import('@/views/home/index.vue'),
+        component: () => import(/* webpackChunkName: "home" */ '@/views/home/index.vue'),
       },
       {
         path: 'profile',
         name: 'profile',
-        component: () => import('@/views/profile/index.vue'),
+        component: () => import(/* webpackChunkName: "profile" */ '@/views/profile/index.vue'),
         meta: { requiresAuth: true },
+      },
+      {
+        path: 'watch/:videoId',
+        name: 'watch',
+        component: () => import(/* webpackChunkName: "watch" */ '@/views/watch/index.vue'),
       },
     ],
   },
   {
     path: '/signin',
     name: 'signin',
-    component: () => import('@/views/signin/index.vue'),
+    component: () => import(/* webpackChunkName: "signin" */ '@/views/signin/index.vue'),
   },
 ]
 
